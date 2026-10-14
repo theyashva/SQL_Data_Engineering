@@ -73,8 +73,3 @@ CREATE TABLE IF NOT EXISTS fact_sales(
 -- Add entries into all tables in ecom_db DATABASE Tables
 
 -- ###   NOTE --->             THE INSERT STATEMENTS ARE PLACED IN FILE :  insert_values_ecom_db_tables.sql              ###
-
-
-
-
-SELECT * FROM dim_customer
