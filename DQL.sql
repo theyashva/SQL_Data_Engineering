@@ -73,3 +73,23 @@ DESC
 LIMIT 3;
 
 
+
+-- GROUPING : calculate avg of unit_price on basis of per category in dim_product Table
+SELECT 
+    category,
+    AVG(unit_price)
+FROM 
+    dim_product
+GROUP BY 
+    category
+
+SELECT * FROM dim_product
+
+
+--  AS : Alias for a given column
+SELECT category AS "Categories", unit_price
+FROM
+    dim_product
+
+
+
