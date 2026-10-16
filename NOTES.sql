@@ -57,3 +57,7 @@
 --                     used when natural key are too long or inconvenient.
 
 
+
+
+
+ -- ## HAVING  : Use having clause when the column is not present in the table, and the column is beaing created in runtime using AS keyword

@@ -77,19 +77,44 @@ LIMIT 3;
 -- GROUPING : calculate avg of unit_price on basis of per category in dim_product Table
 SELECT 
     category,
-    AVG(unit_price)
+    AVG(unit_price) AS "average_unit_price",
+    SUM(unit_price) AS "total_price"
 FROM 
     dim_product
 GROUP BY 
     category
+ORDER BY 
+    total_price
+ASC
 
-SELECT * FROM dim_product
 
 
 --  AS : Alias for a given column
 SELECT category AS "Categories", unit_price
 FROM
     dim_product
+
+
+
+
+
+ -- HAVING  : Use having clause when the column is not present in the table, and the column is beaing created in runtime using AS keyword
+SELECT 
+    category,
+    AVG(unit_price) AS "average_unit_price",
+    SUM(unit_price) AS "total_price"
+FROM 
+    dim_product
+GROUP BY 
+    category
+HAVING
+    total_price < '40373'
+ORDER BY 
+    total_price
+ASC
+
+
+
 
 
 
