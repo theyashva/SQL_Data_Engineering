@@ -61,3 +61,36 @@
 
 
  -- ## HAVING  : Use having clause when the column is not present in the table, and the column is beaing created in runtime using AS keyword
+
+
+
+
+
+
+-- ### FLOW OF EXECUTION (MySQL)
+
+ --- FROM (Table Selection wil happen 1st) -> WHERE (Pruning of rows will take place after table selection) -> GROUP BY  -> HAVING -> SELECT (Select Columns) 
+--   -> ORDER BY -> LIMIT
+
+
+
+
+--  ### JOINS  : Join is merging two or more table, and returns a new resultant table.
+
+
+-- 1. INNER JOIN (Intersection) : When INNER JOIN is applied on table A & B : The common entries that are matching in both tables
+--  will be returned as new resultant table.
+
+-- 2. LEFT JOIN (All Data from LEFT table + Common data from both tables): When LEFT JOIN is applid on tables A & B : All the data
+-- From table A(LEFT Table) and all the common data between table A & B will be the new resultant table. 
+-- NOTE -> THE TABLE THAT HAS FROM CLAUSE IS LEFT TABLE; THE UNMATCHED DATA IN RESULTANT TABLE WILL RETURN NULL.
+
+-- 3. RIGHT JOIN (ALL Data from RIGHT table + Common data from both tables) : When RIGHT JOIN is applid on tables A & B : All the data
+-- From table B (RIGHT Table) and all the common data between table A & B will be the new resultant table. 
+-- NOTE : WE RARELY USE RIGTH JOIN; BECAUSE RIGHT JOIN IS JUST A REVERSE OF LEFT JOIN, THEREFORE WHEN WE WNAT TO ACHIEVE RIGHT JOIN
+--  WE SIMPLY USE THE LEFT JOIN BUT WITH SWAPPED TABLES.
+
+-- FULL JOIN (All data from both tables) : When FULL JOIN is applid on table A & B, the whole data from table A and table B 
+--  is returned as new resultant table.
+--  NOTE : ALL  THE UNMATCHED DATA WILL RETUN NULL.
+
