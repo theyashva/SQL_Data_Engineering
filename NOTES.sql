@@ -90,7 +90,7 @@
 -- NOTE : WE RARELY USE RIGTH JOIN; BECAUSE RIGHT JOIN IS JUST A REVERSE OF LEFT JOIN, THEREFORE WHEN WE WNAT TO ACHIEVE RIGHT JOIN
 --  WE SIMPLY USE THE LEFT JOIN BUT WITH SWAPPED TABLES.
 
--- FULL JOIN (All data from both tables) : When FULL JOIN is applid on table A & B, the whole data from table A and table B 
+-- 4  FULL JOIN (All data from both tables) : When FULL JOIN is applid on table A & B, the whole data from table A and table B 
 --  is returned as new resultant table.
 --  NOTE : ALL  THE UNMATCHED DATA WILL RETUN NULL.
 
