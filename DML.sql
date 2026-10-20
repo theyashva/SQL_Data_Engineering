@@ -40,5 +40,3 @@ WHERE id = 6;
 
 SELECT * FROM insert_demo;
 
-
-
