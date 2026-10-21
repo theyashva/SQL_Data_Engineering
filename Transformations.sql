@@ -50,4 +50,70 @@ FROM
     dim_date;
 
 
+SELECT 
+        --  DATE TYPECASTING : convert to full date timestamp
+    CAST('2005-12-01' AS DATETIME) AS 'casted_date';
+
+
+
+
+
+--  TYPECASTING : Convert one data type to another data type 
+SELECT 
+    course_id,
+    -- converting integer type cplumn to string(char/varchar)
+    CAST(course_id AS CHAR(10))
+FROM 
+    courses;
+
+
+
+
+--  STRING FUNCTIONS :
+--  1. CONCAT (combine multiple columns) 
+
+SELECT 
+    CONCAT(first_name,' ',last_name) AS 'full_name'
+FROM 
+    dim_customer;
+
+
+
+-- 2. LENGTH : calculate length(total no. of characters in a column)
+SELECT 
+    *,
+    --  Calculate number of characters in first_name
+    LENGTH(first_name) AS 'first_name_length'
+FROM
+    dim_customer;
+   
+
+
+
+--  3. LOWER/UPPER : convert string values to upper and lower case
+SELECT 
+    UPPER(first_name),
+    LOWER(last_name)
+FROM 
+    dim_customer;
+
+
+
+--  4. SUBSTRING : Slice the strings
+SELECT 
+    --  get only 3 characters from starting
+    SUBSTRING(first_name,1,3)
+FROM
+    dim_customer;
+
+
+
+
+-- 5. REPLACE : replace an existing value
+SELECT
+    -- replace @ character in email column with : at 
+    REPLACE(email,'@','at')
+FROM
+    dim_customer;
+
 
