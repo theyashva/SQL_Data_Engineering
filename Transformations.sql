@@ -117,3 +117,40 @@ FROM
     dim_customer;
 
 
+--  6. LEFT/RIGHT  : get the number of charters from LEFT or RIGHT
+SELECT 
+    first_name,
+    last_name,
+    -- get 3 characters from RIGHT
+    LEFT(first_name,3),
+    -- get 2 characters from LEFT
+    RIGHT(last_name,2)
+FROM
+    dim_customer;
+
+
+
+-- 7. REVERSE : to reverse a given sequence of characters.
+SELECT 
+    first_name,
+    REVERSE(first_name)
+FROM
+    dim_customer;
+
+
+-- 8. REPEAT :  Repeat a value in column
+SELECT 
+    first_name,
+    -- REPEAT first_name 3 times
+    REPEAT(first_name,3)
+FROM
+    dim_customer;
+
+
+
+-- 9. CONCATE_WS() : used to concat the multiple columns when delimeter is same
+SELECT 
+    CONCAT_WS(' ', first_name, last_name, country)
+FROM 
+    dim_customer;
+
