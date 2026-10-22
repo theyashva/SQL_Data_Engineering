@@ -98,3 +98,12 @@
 
 
 
+--  ### WINDOW FUNCTIONS : Window functions in sql are special functions that perform calculations accross set of rows,
+--                         but without collapsing them into a single output row (unlike AGGREGATE functions).
+
+--  They allow you to perform things like :
+    -- RANKING,
+    -- RUNNING TOTALs
+    -- MOVING AVERAGES
+--  And COMPARISON between rows while still keeping all the rows in the result.
+
