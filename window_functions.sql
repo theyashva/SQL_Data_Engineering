@@ -68,10 +68,17 @@ FROM
 
 
 
+
 --  ### RANKING WINDOW FUNCTIONS :
---  1. ROW NUMBER() : 
---  2. RANK() : 
---  3. DENSE_RANK() :
+--  1. ROW NUMBER() :  Assigns unique numbers to each row. EX :  100, 200, 200, 300, 400, 500 : ranking : 1,2,3,4,5,6.
+--  2. RANK() :  Assigns ranking to each row, foe the repeated values the ranking is same, but for next non repeating value in row,
+--              the rank starts after : the  total number of rows  been processed in the past.
+                --  Example : Values : 100, 200, 200, 300, 400, 500 : ranking : 1, 2, 2, (since the total no. of rows
+                --  that are processed in the past are 3,  there fore the rank for next non repeating vlaue start after this no. i.e. 4
+                -- because 3 rows already been processed. ) 4, 5, 6.
+--  3. DENSE_RANK() : Assignns ranking to each row, for repeated values the rank is same, but for next non repeating value the rank starts
+--                  from where it left in ranking
+--                  Example : 100, 200, 200, 300, 400, 500 : ranking : 1, 2, 2, 3, 4, 5
 
 SELECT 
     *,
@@ -84,3 +91,24 @@ FROM
 SELECT *
 FROM 
     EmployeeSales;
+
+
+
+--  PARTITION BY : Rests the counting 
+SELECT 
+    *,
+    ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary) AS 'row_number',
+    RANK() OVER (PARTITION BY department ORDER BY salary) AS 'rank',
+    DENSE_RANK() OVER (PARTITION BY department ORDER BY salary) AS 'dense_rank'
+FROM 
+    EmployeeSales;
+
+SELECT *
+FROM 
+    EmployeeSales;
+
+
+
+
+
+
