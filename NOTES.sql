@@ -107,3 +107,11 @@
     -- MOVING AVERAGES
 --  And COMPARISON between rows while still keeping all the rows in the result.
 
+
+
+
+
+
+--  ### SUBQUERIES : SQL subqueries are queries that are written inside another query - basically a query within a query,
+--                   they are used when you need to get a result from one query and use it inside another.
+
