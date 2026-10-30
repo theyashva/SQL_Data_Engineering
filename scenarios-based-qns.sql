@@ -82,4 +82,20 @@ WHERE
 
 
 
+-- QNS 4.  Count total dublicate values
+
+WITH removed_dublicates AS
+(
+SELECT 
+    *,
+    ROW_NUMBER() OVER(PARTITION BY emp_name, department, salary, city ORDER BY emp_id) AS 'rank_'
+FROM 
+    employees
+)
+SELECT
+    COUNT(*) AS 'total_dublicates'
+FROM 
+    removed_dublicates
+WHERE
+    rank_ > 1
 
