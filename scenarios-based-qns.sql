@@ -199,3 +199,9 @@ FROM
     bank_transactions;
 
 
+
+
+
+
+-- QNS 6. 
+
