@@ -94,7 +94,7 @@ FROM
 
 
 
---  PARTITION BY : Rests the counting 
+--  PARTITION BY : Resets the counting 
 SELECT 
     *,
     ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary) AS 'row_number',
