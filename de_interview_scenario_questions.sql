@@ -68,6 +68,23 @@ LIMIT 5;
 --   - total_orders
 -- Conditions:
 --   - Order by total_revenue descending.
+SELECT 
+      d.category,
+      COALESCE(SUM(f.total_amount),0) AS 'total_revenue',
+      COALESCE(SUM(f.quantity_sold),0) AS 'total_quantity_sold',
+      COUNT(f.sales_id) AS 'total_orders'
+FROM
+    dim_product d
+LEFT JOIN
+        fact_sales f
+ON
+  d.product_key = f.product_key
+GROUP BY 
+        d.category
+ORDER BY 
+        total_revenue DESC;
+        
+
 
 
 
