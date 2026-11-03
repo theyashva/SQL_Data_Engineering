@@ -104,6 +104,28 @@ ORDER BY
 --   - Use an anti-join (LEFT JOIN ... WHERE ... IS NULL) or NOT EXISTS.
 
 
+WITH zero_purchase_customers AS
+(
+SELECT 
+      c.customer_key,
+      c.customer_id,
+      CONCAT(c.first_name, ' ', c.last_name) AS 'customer_name',
+      c.email
+FROM
+      dim_customer c
+LEFT JOIN 
+      fact_sales f
+ON
+      c.customer_key = f.customer_key
+WHERE
+      f.customer_key is NULL
+)
+SELECT 
+      *
+FROM 
+      zero_purchase_customers;
+
+
 
 
 -- QNS 4. Month-wise Revenue and Average Order Value (AOV)
