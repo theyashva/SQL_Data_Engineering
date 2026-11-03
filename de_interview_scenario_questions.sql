@@ -145,6 +145,33 @@ FROM
 --   - Sort chronologically by month.
 
 
+SELECT 
+      d.year,
+      d.month,
+      d.month_name,
+      SUM(f.total_amount) AS 'monthly_revenue',
+      ROUND(SUM(f.total_amount) / NULLIF(COUNT(DISTINCT f.sales_id),0),2) AS 'average_order_value'
+FROM 
+      fact_sales f
+LEFT JOIN
+      dim_date d
+ON 
+      f.date_key = d.date_key
+WHERE    
+      d.year = 2025
+GROUP BY
+      d.year,
+      d.month,
+      d.month_name
+ORDER BY
+      d.month;
+
+
+
+
+
+
+SELECT * FROM dim_date WHERE year = 2025;
 
 
 -- QNS 5. Remove Duplicate Customer Records using ROW_NUMBER()
