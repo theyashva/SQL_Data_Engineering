@@ -370,6 +370,9 @@ ORDER BY
 
 
 
+
+
+
 -- QNS 10. Daily Running Total of Revenue per Store
 -- Scenario / Objective:
 --   Calculate a continuous running total (cumulative sum) of daily revenue for each store ordered by date.
@@ -384,6 +387,42 @@ ORDER BY
 --   - running_total_sales
 -- Conditions:
 --   - Use SUM() OVER (PARTITION BY ... ORDER BY ...).
+
+WITH daily_sales AS
+(
+SELECT 
+      ds.store_key,
+      ds.store_name,
+      dd.date,
+      SUM(fa.total_amount) AS 'daily_sales'
+FROM
+      dim_store ds
+LEFT JOIN
+      fact_sales fa
+ON
+      ds.store_key = fa.store_key
+LEFT JOIN 
+      dim_date dd
+ON 
+      fa.date_key = dd.date_key
+GROUP BY
+      ds.store_name,
+      ds.store_key,
+      dd.date
+)
+SELECT 
+      store_name,
+      date,
+      daily_sales,
+      SUM(daily_sales) OVER(PARTITION BY store_key ORDER BY date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS 'running_total_sales' 
+FROM 
+      daily_sales
+ORDER BY
+      store_name,
+      date;
+
+
+
 
 
 
