@@ -263,6 +263,30 @@ WHERE
 
 
 
+SELECT 
+      dp.product_key,
+      dp.product_name,
+      dp.category
+
+FROM
+      dim_product dp
+WHERE NOT EXISTS(
+      SELECT *
+      FROM
+            fact_sales fa
+      LEFT JOIN
+            dim_store ds
+      ON 
+            fa.store_key = ds.store_key
+      WHERE 
+            fa.product_key = dp.product_key AND ds.region = 'North'
+);
+
+
+
+
+
+
 
 -- QNS 8. Weekend vs Weekday Sales Performance Comparison
 -- Scenario / Objective:
