@@ -169,6 +169,45 @@ ORDER BY
 
 
 
+-- QNS 5. Remove Duplicate Customer Records using ROW_NUMBER()
+-- Scenario / Objective:
+--   In a staging table `customer_stg`, multiple rows exist with the same email due to duplicate ingestion.
+--   Write a query to fetch only the first record for each email based on the lowest `customer_key`.
+-- Table to use:
+--   - dim_customer (customer_key, customer_id, first_name, last_name, email, city)
+-- Required columns:
+--   - customer_key
+--   - customer_id
+--   - first_name
+--   - last_name
+--   - email
+--   - city
+-- Conditions:
+--   - Filter so only rank = 1 is returned per email.
+
+
+
+WITH dedub AS
+(
+SELECT 
+      customer_key,
+      customer_id,
+      first_name,
+      last_name,
+      email,
+      city,
+      ROW_NUMBER() OVER(PARTITION BY email, customer_key, customer_id, first_name, last_name, city ORDER BY customer_id) AS 'rank_'
+FROM
+      dim_customer
+)
+SELECT 
+      *
+FROM
+      dedub
+WHERE
+      rank_ = 1;
+
+
 
 
 
