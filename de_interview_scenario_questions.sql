@@ -225,6 +225,26 @@ WHERE
 --   - Use DENSE_RANK() so ties for 1st place do not skip rank 2.
 
 
+WITH second_highest AS
+(
+SELECT 
+      department, 
+      emp_name,
+      salary,
+      DENSE_RANK() OVER(PARTITION BY department ORDER BY salary DESC) AS 'salary_rank'
+FROM
+      employees
+)
+SELECT
+      *
+FROM
+      second_highest
+WHERE 
+      salary_rank =2;
+
+
+
+
 
 
 -- QNS 7. Products Never Sold in a Specific Region
