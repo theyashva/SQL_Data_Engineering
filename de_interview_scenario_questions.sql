@@ -302,6 +302,29 @@ WHERE NOT EXISTS(
 --   - avg_revenue_per_order
 
 
+SELECT 
+      CASE 
+            WHEN (dd.is_weekend = 1) THEN  'Weekend'
+            ELSE  'Weekday'
+      END AS 'day_type',
+      COUNT(DISTINCT(fa.sales_id)) AS 'total_orders',
+      SUM(fa.quantity_sold) AS 'total_units_sold',
+      SUM(fa.total_amount) AS 'total_revenue',
+      SUM(fa.total_amount) / COUNT(DISTINCT(fa.sales_id)) AS 'avg_revenue_per_order'
+FROM
+      fact_sales fa 
+LEFT JOIN
+      dim_date dd
+ON 
+      fa.date_key = dd.date_key
+GROUP BY
+      dd.is_weekend;
+
+
+
+
+
+
 
 
 -- QNS 9. Customer Spending Tier Segmentation (CASE WHEN)
