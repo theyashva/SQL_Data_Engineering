@@ -318,8 +318,7 @@ LEFT JOIN
 ON 
       fa.date_key = dd.date_key
 GROUP BY
-      dd.is_weekend;
-
+            dd.is_weekend;
 
 
 
@@ -344,6 +343,30 @@ GROUP BY
 -- Conditions:
 --   - Include customers with 0 purchases in 'Tier 3 - Low'.
 
+
+
+
+SELECT 
+      dc.customer_key,
+      CONCAT(dc.first_name, ' ', dc.last_name) AS 'customer_name',
+      COALESCE(SUM(fa.total_amount),0) AS 'total_spent',
+      CASE
+            WHEN COALESCE(SUM(fa.total_amount), 0) >= 50000 THEN 'High'
+            WHEN COALESCE(SUM(fa.total_amount), 0) >= 20000 THEN 'Medium'
+            ELSE 'Low'
+      END AS spending_tier
+FROM
+      dim_customer dc
+LEFT JOIN
+      fact_sales fa
+ON 
+     fa.customer_key = dc.customer_key
+GROUP BY
+dc.customer_key,
+dc.first_name,
+dc.last_name
+ORDER BY
+    COALESCE(SUM(fa.total_amount),0) DESC;  
 
 
 
