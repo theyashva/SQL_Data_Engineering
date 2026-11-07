@@ -443,6 +443,38 @@ ORDER BY
 
 
 
+WITH department_avg_salary AS
+(
+SELECT 
+      emp_id,
+      emp_name,
+      salary,
+      department,
+      AVG(salary) OVER(PARTITION BY department) AS 'dept_avg_salary'
+FROM
+      employees
+),
+emp_above_dept_avg AS
+(
+      SELECT
+            emp_id,
+            emp_name,
+            salary,
+            department,
+            dept_avg_salary,
+            (salary - dept_avg_salary) AS 'extra_salary_above_dept_avg'
+      FROM 
+            department_avg_salary
+      WHERE
+            salary > dept_avg_salary
+)
+SELECT * FROM emp_above_dept_avg;
+
+
+
+
+
+
 
 -- QNS 12. Year-over-Year (YoY) Sales Comparison (2024 vs 2025)
 -- Scenario / Objective:
