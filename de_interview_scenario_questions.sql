@@ -476,6 +476,7 @@ SELECT * FROM emp_above_dept_avg;
 
 
 
+
 -- QNS 12. Year-over-Year (YoY) Sales Comparison (2024 vs 2025)
 -- Scenario / Objective:
 --   Display total revenue for each product category side-by-side for the years 2024 and 2025 in separate columns.
@@ -490,6 +491,61 @@ SELECT * FROM emp_above_dept_avg;
 --   - yoy_diff (sales_2025 - sales_2024)
 -- Conditions:
 --   - Use conditional aggregation (SUM(CASE WHEN ...)).
+
+
+
+SELECT 
+      dp.category,
+      COALESCE(SUM(
+            CASE 
+                  WHEN dd.year = 2024 THEN  fa.total_amount
+                  ELSE  0
+            END
+      ),0 ) AS 'sales_2024',
+      COALESCE(SUM(
+            CASE 
+                  WHEN dd.year = 2025 THEN  fa.total_amount
+                  ELSE  0
+            END
+      ),0 ) AS 'sales_2024',
+      (COALESCE(SUM(
+            CASE 
+                  WHEN dd.year = 2024 THEN  fa.total_amount
+                  ELSE  0
+            END
+      ),0 ) 
+      -
+      COALESCE(SUM(
+            CASE 
+                  WHEN dd.year = 2025 THEN  fa.total_amount
+                  ELSE  0
+            END
+      ),0 )
+      ) AS yoy_diff
+FROM
+      dim_product dp
+LEFT JOIN
+      fact_sales fa
+ON 
+      dp.product_key = fa.product_key
+LEFT JOIN
+      dim_date dd
+ON 
+      fa.date_key = dd.date_key
+WHERE 
+      dd.year IN (2024,2025)
+GROUP BY 
+      dp.category
+ORDER BY 
+      dp.category;
+
+      
+
+
+
+SELECT * FROM fact_sales;
+
+
 
 
 
