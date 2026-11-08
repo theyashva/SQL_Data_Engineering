@@ -543,9 +543,6 @@ ORDER BY
 
 
 
-SELECT * FROM fact_sales;
-
-
 
 
 
@@ -566,6 +563,45 @@ SELECT * FROM fact_sales;
 --   - total_amount
 -- Conditions:
 --   - Use ROW_NUMBER() partitioned by customer_key ordered by date descending.
+
+
+WITH purchase_per_customer AS
+(
+SELECT 
+      dc.customer_key,
+      CONCAT(dc.first_name,' ',dc.last_name) AS 'customer_name',
+      dd.date AS 'latest_order_date',
+      dp.product_name,
+      fs.total_amount,
+      ROW_NUMBER() OVER(PARTITION BY dc.customer_key ORDER BY dd.date DESC) AS 'rank_'
+FROM
+      dim_customer dc
+LEFT JOIN 
+      fact_sales fs
+ON 
+      dc.customer_key = fs.customer_key
+LEFT JOIN
+      dim_product dp
+ON 
+      fs.product_key = dp.product_key
+LEFT JOIN
+      dim_date dd
+ON 
+      fs.date_key = dd.date_key
+)
+SELECT 
+      customer_key,
+      customer_name,
+      latest_order_date,
+      product_name,
+      total_amount 
+FROM
+      purchase_per_customer
+WHERE
+      rank_ = 1;
+
+
+
 
 
 
