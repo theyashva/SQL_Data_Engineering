@@ -620,6 +620,41 @@ WHERE
 
 
 
+WITH details_per_product AS
+(
+SELECT
+      dp.category,
+      dp.unit_price,
+      ROW_NUMBER() OVER(PARTITION BY dp.category ORDER BY dp.unit_price DESC) AS 'rank_'
+FROM
+      dim_product dp
+)
+SELECT
+      category,
+      MIN(unit_price) AS 'min_price',
+      MAX(unit_price) AS 'max_price',
+      (Max(unit_price) - MIN(unit_price)) AS 'price_spread',
+      MAX(rank_) AS 'total_products_in_category'
+FROM
+       details_per_product
+GROUP BY
+      category;
+
+
+-- Second approach
+SELECT
+      category,
+      MIN(unit_price) AS 'min_price',
+      MAX(unit_price) AS 'max_price',
+      (Max(unit_price) - MIN(unit_price)) AS 'price_spread',
+      COUNT(*) AS 'total_products_in_category'
+FROM
+       dim_product
+GROUP BY 
+      category;
+
+
+
 
 -- QNS 15. Clean Dirty Phone Numbers & Filter Valid Length
 -- Scenario / Objective:
