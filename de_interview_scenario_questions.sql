@@ -711,6 +711,46 @@ WHERE
 --   - store_revenue
 --   - region_avg_store_revenue
 
+WITH revenue_by_store AS
+(
+SELECT
+      ds.region,
+      ds.store_name,
+      COALESCE(SUM(fs.total_amount),0) AS 'store_revenue'
+FROM
+      dim_store ds
+LEFT JOIN
+      fact_sales fs
+ON
+      ds.store_key = fs.store_key
+GROUP BY
+      ds.store_key,
+      ds.region,
+      ds.store_name
+),
+revenue_by_region AS
+(
+SELECT 
+      region,
+      store_name,
+      store_revenue,
+      AVG(store_revenue) OVER(PARTITION BY region) AS 'region_avg_store_revenue'
+FROM 
+      revenue_by_store
+)
+SELECT 
+      region,
+      store_name,
+      store_revenue,
+      region_avg_store_revenue
+FROM
+      revenue_by_region
+WHERE
+      store_revenue > region_avg_store_revenue;
+
+
+
+
 
 
 
