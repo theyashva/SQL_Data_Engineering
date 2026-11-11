@@ -656,6 +656,8 @@ GROUP BY
 
 
 
+
+
 -- QNS 15. Clean Dirty Phone Numbers & Filter Valid Length
 -- Scenario / Objective:
 --   In `dim_customer`, phone numbers contain characters like dashes, spaces, and brackets.
@@ -669,6 +671,30 @@ GROUP BY
 --   - digit_count
 -- Conditions:
 --   - Filter only rows where digit_count = 10.
+
+
+
+WITH cleaned_phone AS
+(
+select
+      customer_key,
+      phone AS 'original_phone',
+      REGEXP_REPLACE(phone, '[^0-9]', '') AS 'clean_phone'
+FROM
+      dim_customer
+)
+SELECT
+      customer_key,
+      original_phone,
+      clean_phone,
+      CHAR_LENGTH(clean_phone) AS 'digit_count'
+FROM 
+      cleaned_phone
+WHERE
+      CHAR_LENGTH(clean_phone) = 10;
+
+
+
 
 
 
