@@ -954,8 +954,6 @@ FROM
 
 
 
-
-
 -- QNS 20. Find Missing Sequence Numbers in Transaction IDs
 -- Scenario / Objective:
 --   In `bank_transactions`, transaction IDs are expected to be strictly consecutive.
@@ -968,6 +966,29 @@ FROM
 --   - gap_size (next_actual_id - current_id - 1)
 -- Conditions:
 --   - Filter only rows where a gap exists (gap_size > 0).
+
+
+WITH transaction_sequence AS 
+(
+SELECT 
+      transaction_id AS 'current_id',
+      LEAD(transaction_id) OVER(ORDER BY transaction_id) AS 'next_actual_id'
+FROM
+      bank_transactions
+)
+SELECT 
+      current_id, 
+      (current_id + 1) AS 'next_ecpected_id',
+      (next_actual_id - current_id -1) AS 'gap_size'
+FROM
+      transaction_sequence
+WHERE
+      (next_actual_id - current_id -1) > 0
+ORDER BY
+      current_id;
+
+
+
 
 
 
