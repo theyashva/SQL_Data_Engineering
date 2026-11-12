@@ -914,6 +914,43 @@ GROUP BY
 --   - pct_contribution (round to 2 decimals)
 
 
+WITH sales_by_product AS 
+(
+SELECT 
+      dp.category,
+      dp.product_name,
+      SUM(fs.total_amount) AS 'product_sales'
+FROM
+      dim_product dp 
+LEFT JOIN 
+      fact_sales fs 
+ON
+      dp.product_key = fs.product_key
+GROUP BY
+      dp.product_name,
+      dp.category,
+      dp.product_key
+),
+sales_by_category AS 
+(
+SELECT 
+      category,
+      product_name,
+      product_sales,
+      SUM(product_sales) OVER(PARTITION BY category) AS 'category_total_sales'
+FROM
+      sales_by_product
+)
+SELECT 
+      category,
+      product_name,
+      product_sales,
+      category_total_sales,
+      CONCAT(ROUND((product_sales / category_total_sales*100),2), ' ','%') AS 'pct_contribution'
+FROM
+      sales_by_category;
+
+
 
 
 
