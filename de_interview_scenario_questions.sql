@@ -834,6 +834,7 @@ WHERE
 
 
 
+
 -- QNS 18. Pivot Quarterly Sales by Store into Columns
 -- Scenario / Objective:
 --   Display quarterly sales for each store as separate columns (Q1, Q2, Q3, Q4) for the year 2025.
@@ -848,6 +849,49 @@ WHERE
 --   - q3_sales
 --   - q4_sales
 --   - annual_total_sales
+
+
+
+SELECT 
+      ds.store_name,
+      COALESCE(SUM(
+            CASE 
+                  WHEN (dd.quarter = 1) THEN  fs.total_amount
+                  ELSE  0
+            END
+      ),0) AS 'q1_sales',
+      COALESCE(SUM(
+            CASE 
+                  WHEN (dd.quarter = 2) THEN  fs.total_amount
+                  ELSE  0
+            END
+      ),0) AS 'q2_sales',
+      COALESCE(SUM(
+            CASE 
+                  WHEN (dd.quarter = 3) THEN  fs.total_amount
+                  ELSE  0
+            END
+      ),0) AS 'q3_sales',
+      COALESCE(SUM(
+            CASE 
+                  WHEN (dd.quarter = 4) THEN  fs.total_amount
+                  ELSE  0
+            END
+      ),0) AS 'q4_sales',
+      COALESCE(SUM(fs.total_amount),0) AS 'annual_total_sales'
+
+FROM
+      dim_store ds 
+LEFT JOIN
+      fact_sales fs 
+ON 
+      ds.store_key = fs.store_key
+LEFT JOIN 
+      dim_date dd
+ON 
+      dd.date_key = fs.date_key
+GROUP BY
+      ds.store_name;
 
 
 
@@ -868,6 +912,9 @@ WHERE
 --   - product_sales
 --   - category_total_sales
 --   - pct_contribution (round to 2 decimals)
+
+
+
 
 
 
