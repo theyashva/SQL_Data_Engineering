@@ -769,6 +769,70 @@ WHERE
 
 
 
+WITH customer_purchase_dates AS
+(
+SELECT 
+      DISTINCT
+      fs.customer_key,
+      dd.date AS 'purchase_date'
+FROM
+      fact_sales fs
+LEFT JOIN
+      dim_date dd
+ON 
+      fs.date_key = dd.date_key
+),
+purchase_sequence AS 
+(
+SELECT 
+      customer_key,
+      purchase_date AS 'first_purchase_date',
+      LEAD(purchase_date) OVER(PARTITION BY customer_key ORDER BY purchase_date) AS 'next_purchase_date'
+FROM
+      customer_purchase_dates
+)
+SELECT 
+      customer_key,
+      first_purchase_date,
+      neext_purchase_date
+FROM 
+      purchase_sequence
+WHERE
+      DATEDIFF(next_purchase_date, first_purchase_date) = 1;
+WITH customer_purchase_dates AS
+(
+SELECT 
+      DISTINCT
+      fs.customer_key,
+      dd.date AS 'purchase_date'
+FROM
+      fact_sales fs
+LEFT JOIN
+      dim_date dd
+ON 
+      fs.date_key = dd.date_key
+),
+purchase_sequence AS 
+(
+SELECT 
+      customer_key,
+      purchase_date AS 'first_purchase_date',
+      LEAD(purchase_date) OVER(PARTITION BY customer_key ORDER BY purchase_date) AS 'next_purchase_date'
+FROM
+      customer_purchase_dates
+)
+SELECT 
+      customer_key,
+      first_purchase_date,
+      next_purchase_date
+FROM 
+      purchase_sequence
+WHERE
+      DATEDIFF(next_purchase_date, first_purchase_date) = 1;
+
+
+
+
 
 -- QNS 18. Pivot Quarterly Sales by Store into Columns
 -- Scenario / Objective:
@@ -784,6 +848,10 @@ WHERE
 --   - q3_sales
 --   - q4_sales
 --   - annual_total_sales
+
+
+
+
 
 
 
