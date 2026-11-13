@@ -1016,6 +1016,65 @@ ORDER BY
 
 
 
+WITH mn_m_y AS 
+(
+SELECT 
+      dd.year,
+      dd.month,
+      dd.month_name,
+      fs.total_amount
+FROM
+      fact_sales fs
+LEFT JOIN
+      dim_date dd
+ON 
+      fs.date_key = dd.date_key
+),
+current_month_sales AS
+(
+      SELECT 
+            year,
+            month,
+            month_name,
+            SUM(total_amount) AS 'current_month_sales'
+      FROM
+            mn_m_y
+      GROUP BY
+            year,
+            month,
+            month_name
+),
+previous_month_sales AS 
+(
+      SELECT
+            year,
+            month,
+            month_name,
+            current_month_sales,
+            LAG(current_month_sales) OVER(ORDER BY year, month) AS 'previous_month_sales'
+FROM 
+      current_month_sales
+)
+SELECT 
+      year,
+      month,
+      month_name,
+      current_month_sales,
+      previous_month_sales,
+      CASE 
+            WHEN previous_month_sales IS NULL THEN  '0.00 %'
+            WHEN previous_month_sales = 0 THEN '0.00 %'
+            ELSE  CONCAT(
+                  ROUND(((current_month_sales - previous_month_sales) / previous_month_sales) * 100, 2), ' %' 
+            )
+      END AS mom_growth_pct
+FROM
+      previous_month_sales;
+      
+
+
+
+
 
 -- QNS 22. Running Account Balance and Overdraft Flagging
 -- Scenario / Objective:
