@@ -1051,7 +1051,7 @@ previous_month_sales AS
             month,
             month_name,
             current_month_sales,
-            LAG(current_month_sales) OVER(ORDER BY year, month) AS 'previous_month_sales'
+            LAG(current_month_sales) OVER(ORDER BY year, month) AS 'prev_month_sales'
 FROM 
       current_month_sales
 )
@@ -1060,12 +1060,12 @@ SELECT
       month,
       month_name,
       current_month_sales,
-      previous_month_sales,
+      prev_month_sales,
       CASE 
-            WHEN previous_month_sales IS NULL THEN  '0.00 %'
-            WHEN previous_month_sales = 0 THEN '0.00 %'
+            WHEN prev_month_sales IS NULL THEN  '0.00 %'
+            WHEN prev_month_sales = 0 THEN '0.00 %'
             ELSE  CONCAT(
-                  ROUND(((current_month_sales - previous_month_sales) / previous_month_sales) * 100, 2), ' %' 
+                  ROUND(((current_month_sales - prev_month_sales) / prev_month_sales) * 100, 2), ' %' 
             )
       END AS mom_growth_pct
 FROM
@@ -1091,6 +1091,55 @@ FROM
 --   - amount
 --   - calculated_running_balance
 --   - status_flag ('OVERDRAFT' if balance < 0, else 'NORMAL')
+
+WITH signed_transactions AS 
+(
+SELECT 
+      transaction_id,
+      account_id,
+      transaction_date,
+      transaction_type,
+      amount,
+      CASE 
+            WHEN transaction_type='WITHDRAWAL' THEN  -amount
+            WHEN transaction_type='DEPOSIT' THEN  amount 
+            ELSE  0
+      END AS 'signed_amount'
+FROM 
+bank_transactions
+),
+running_balance AS
+(
+      SELECT
+            transaction_id,
+            account_id,
+            transaction_date,
+            transaction_type,
+            amount,
+            SUM(signed_amount) OVER(PARTITION BY account_id ORDER BY transaction_id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS 'calculated_running_balance'
+      FROM
+            signed_transactions
+)
+SELECT 
+      transaction_id,
+      account_id,
+      transaction_date,
+      transaction_type,
+      amount,
+      calculated_running_balance,
+      CASE 
+            WHEN calculated_running_balance < 0 THEN  'OVERDRAFT'
+            ELSE  'NORMAL'
+      END AS 'status_flag'
+FROM 
+      running_balance
+ORDER BY
+      account_id,
+      transaction_date,
+      transaction_id;
+
+
+
 
 
 
