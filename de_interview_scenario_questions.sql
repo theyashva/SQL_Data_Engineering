@@ -1141,9 +1141,6 @@ ORDER BY
 
 
 
-
-
-
 -- QNS 23. 7-Day Moving Average of Daily Store Sales
 -- Scenario / Objective:
 --   Calculate the 7-day moving average of daily sales for each store.
@@ -1156,6 +1153,43 @@ ORDER BY
 --   - date
 --   - daily_sales
 --   - rolling_7day_avg (average of current day and preceding 6 days)
+
+
+WITH sales_details AS
+(
+SELECT 
+      ds.store_name,
+      dd.date,
+      fs.store_key,
+      COALESCE(SUM(fs.total_amount),0) AS 'daily_sales'
+FROM
+      dim_date dd
+LEFT JOIN
+      fact_sales fs 
+ON
+      dd.date_key = fs.date_key
+LEFT JOIN
+      dim_store ds
+ON
+      fs.store_key = ds.store_key
+GROUP BY
+      ds.store_name,
+      dd.date,
+      fs.store_key
+)
+SELECT 
+      store_name,
+      date,
+      daily_sales,
+      AVG(daily_sales) OVER(PARTITION BY store_key ORDER BY date ROWS BETWEEN 6  PRECEDING AND CURRENT ROW) AS 'rolling_7day_avg'
+FROM
+      sales_details
+ORDER BY
+      date,
+      store_name;
+
+
+
 
 
 
