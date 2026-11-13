@@ -1212,6 +1212,75 @@ ORDER BY
 
 
 
+WITH daily_sales AS
+(
+SELECT
+      ds.store_key,
+      ds.store_name,
+      dd.date,
+      COALESCE(SUM(fs.total_amount),0) AS 'day_1_sales'
+FROM
+      dim_date dd
+LEFT JOIN
+      fact_sales fs
+ON 
+      dd.date_key = fs.date_key
+LEFT JOIN
+      dim_store ds
+ON 
+      ds.store_key = fs.store_key
+GROUP BY
+      ds.store_key,
+      ds.store_name,
+      dd.date
+),
+consecutive_3_day_sales AS 
+(
+SELECT 
+      store_key,
+      store_name,
+      date AS 'day_1_date',
+      day_1_sales,
+      LEAD(day_1_sales,1) OVER(PARTITION BY store_key ORDER BY date) AS 'day_2_sales',
+      LEAD(day_1_sales,2) OVER(PARTITION BY store_key ORDER BY date) AS 'day_3_sales'
+FROM
+      daily_sales
+),
+consecutive_3_day_dates AS
+(
+SELECT
+      store_key,
+      store_name,
+      day_1_date,
+      LEAD(day_1_date,1) OVER(PARTITION BY store_key ORDER BY day_1_date) AS 'day_2_date',
+      LEAD(day_1_date,2) OVER(PARTITION BY store_key ORDER BY day_1_date) AS 'day_3_date',
+      day_1_sales,
+      day_2_sales,
+      day_3_sales
+FROM
+      consecutive_3_day_sales
+)
+SELECT 
+      store_name,
+      day_1_date,
+      day_2_date,
+      day_3_date,
+      day_1_sales,
+      day_2_sales,
+      day_3_sales
+FROM
+      consecutive_3_day_dates
+WHERE
+      ((day_1_sales < day_2_sales) AND (day_2_sales < day_3_sales))
+      AND
+      ((DATEDIFF(day_2_date,day_1_date) = 1 AND DATEDIFF(day_3_date, day_2_date) = 1));
+
+
+
+
+
+
+
 
 -- QNS 25. Employees Earning More than Their Direct Manager (Self-Join)
 -- Scenario / Objective:
