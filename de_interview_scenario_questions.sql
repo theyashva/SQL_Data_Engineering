@@ -1282,18 +1282,44 @@ WHERE
 
 
 
--- QNS 25. Employees Earning More than Their Direct Manager (Self-Join)
+-- QNS 25. Employees with the Same Salary in the Same Department (Self-Join)
 -- Scenario / Objective:
---   From an employee hierarchy table, find all employees whose salary is higher than their direct manager's salary.
+--   From the employees table, find pairs of different employees who work
+--   in the same department and earn the same salary.
+--
 -- Table to use:
---   - employees (emp_id, emp_name, department, salary, manager_id)
+--   - employees (emp_id, emp_name, department, salary, city)
+--
 -- Required columns:
 --   - employee_id
 --   - employee_name
---   - employee_salary
---   - manager_name
---   - manager_salary
---   - salary_difference (employee_salary - manager_salary)
+--   - department
+--   - salary
+--   - matching_employee_id
+--   - matching_employee_name
+--
+-- Conditions:
+--   - Employees must belong to the same department.
+--   - Employees must have the same salary.
+--   - Do not match an employee with themselves.
+--   - Display each pair only once.
+
+
+SELECT
+    e.emp_id AS employee_id,
+    e.emp_name AS employee_name,
+    e.department,
+    e.salary,
+    m.emp_id AS matching_employee_id,
+    m.emp_name AS matching_employee_name
+FROM employees AS e
+JOIN employees AS m
+    ON e.department = m.department
+   AND e.salary = m.salary
+   AND e.emp_id < m.emp_id;
+
+   
+
 
 
 
