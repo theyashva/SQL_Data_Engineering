@@ -1342,6 +1342,53 @@ JOIN employees AS m
 --   - latest_purchase_date
 
 
+WITH customer_insights AS
+(
+SELECT      
+      dd.date,
+      dp.product_name,
+      fs.customer_key,
+      CONCAT(dc.first_name,' ', dc.last_name) AS 'customer_name',
+      ROW_NUMBER() OVER(PARTITION BY fs.customer_key ORDER BY dd.date ASC fs.product_key ASC) AS 'rank_'
+FROM
+      dim_customer dc
+LEFT JOIN
+      fact_sales fs
+ON 
+      dc.customer_key = fs.customer_key
+LEFT JOIN
+      dim_date dd
+ON
+      fs.date_key = dd.date_key
+LEFT JOIN
+      dim_product dp
+ON
+      fs.product_key = dp.product_key
+WHERE 
+      dp.product_name IS NOT NULL
+)
+SELECT 
+      customer_key,
+      customer_name,
+      CASE WHEN rank_ = 1  THEN  product_name END AS 'latest_product_bought',
+      CASE WHEN rank_ = 1  THEN  date END AS 'latest_purchase_date',
+      CASE WHEN rank_ = MAX(rank_)  THEN  product_name END AS 'first_product_bought',
+      CASE WHEN rank_ = MAX(rank_)  THEN  date END AS 'first_purchase_date'
+FROM
+      customer_insights
+GROUP BY  
+      customer_name,
+      customer_key;
+
+
+
+
+
+
+SELECT * FROM dim_date;
+SELECT * FROM dim_customer;
+SELECT * FROM dim_product;
+
 
 
 -- QNS 27. Web Sessionization with 30-Minute Inactivity Window
@@ -1356,6 +1403,8 @@ JOIN employees AS m
 --   - click_timestamp
 --   - page_url
 --   - session_id (incremental session number: 1, 2, 3... per user)
+
+
 
 
 
