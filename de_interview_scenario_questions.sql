@@ -1349,7 +1349,8 @@ SELECT
       dp.product_name,
       fs.customer_key,
       CONCAT(dc.first_name,' ', dc.last_name) AS 'customer_name',
-      ROW_NUMBER() OVER(PARTITION BY fs.customer_key ORDER BY dd.date ASC fs.product_key ASC) AS 'rank_'
+      ROW_NUMBER() OVER(PARTITION BY dc.customer_key ORDER BY dd.date ASC, fs.product_key ASC) AS 'first_rank',
+      ROW_NUMBER() OVER(PARTITION BY dc.customer_key ORDER BY dd.date DESC, fs.product_key DESC) AS 'latest_rank'
 FROM
       dim_customer dc
 LEFT JOIN
@@ -1370,24 +1371,86 @@ WHERE
 SELECT 
       customer_key,
       customer_name,
-      CASE WHEN rank_ = 1  THEN  product_name END AS 'latest_product_bought',
-      CASE WHEN rank_ = 1  THEN  date END AS 'latest_purchase_date',
-      CASE WHEN rank_ = MAX(rank_)  THEN  product_name END AS 'first_product_bought',
-      CASE WHEN rank_ = MAX(rank_)  THEN  date END AS 'first_purchase_date'
+      MIN(CASE WHEN first_rank = 1 THEN product_name END) AS 'first_product_bought',
+      MIN(CASE WHEN first_rank = 1  THEN date END) AS 'first_purchase_date',
+      MIN(CASE WHEN latest_rank = 1 THEN product_name END) AS 'latest_product_bought',
+      MIN(CASE WHEN latest_rank = 1  THEN date END) AS 'latest_purchase_date'
 FROM
       customer_insights
-GROUP BY  
-      customer_name,
-      customer_key;
+GROUP BY
+      customer_key,
+      customer_name;
 
 
 
 
 
 
-SELECT * FROM dim_date;
-SELECT * FROM dim_customer;
-SELECT * FROM dim_product;
+--  2nd Approach
+WITH customer_insights AS
+(
+SELECT      
+      dd.date,
+      dp.product_name,
+      fs.customer_key,
+      ROW_NUMBER() OVER(PARTITION BY dc.customer_key ORDER BY dd.date ASC, fs.product_key ASC) AS 'first_rank',
+      ROW_NUMBER() OVER(PARTITION BY dc.customer_key ORDER BY dd.date DESC, fs.product_key DESC) AS 'latest_rank'
+FROM
+      dim_customer dc
+LEFT JOIN
+      fact_sales fs
+ON 
+      dc.customer_key = fs.customer_key
+LEFT JOIN
+      dim_date dd
+ON
+      fs.date_key = dd.date_key
+LEFT JOIN
+      dim_product dp
+ON
+      fs.product_key = dp.product_key
+WHERE 
+      dp.product_name IS NOT NULL
+),
+
+first_purchase AS (
+      SELECT 
+            * 
+      FROM
+            customer_insights
+      WHERE
+            first_rank = 1
+),
+
+latest_purchase AS (
+      SELECT 
+            *
+      FROM
+            customer_insights
+      WHERE 
+            latest_rank = 1
+)
+SELECT 
+      dc.customer_key,
+      CONCAT(dc.first_name,' ', dc.last_name) AS 'customer_name',
+      fp.product_name AS 'first_product_bought',
+      fp.date AS 'first_purchase_date',
+      lp.product_name AS 'latest_product_bought',
+      lp.date AS 'latest_purchase_date'
+FROM  
+      dim_customer dc
+LEFT JOIN 
+      first_purchase fp
+ON
+      dc.customer_key = fp.customer_key
+LEFT JOIN
+      latest_purchase lp 
+ON
+      dc.customer_key = lp.customer_key;
+
+
+
+
 
 
 
