@@ -1468,6 +1468,7 @@ ON
 --   - session_id (incremental session number: 1, 2, 3... per user)
 
 
+--  ^^^ NOT APPLICABLE QUESTION
 
 
 
@@ -1485,6 +1486,43 @@ ON
 --   - first_order_date
 --   - second_order_date
 --   - days_between_orders (must be <= 7)
+
+
+
+WITH customers_cte AS 
+(
+SELECT 
+      fs.date_key,
+      dc.customer_key,
+      CONCAT(dc.first_name,' ',dc.last_name) AS 'customer_name',
+      dd.date AS 'order_date',
+      ROW_NUMBER() OVER(PARTITION BY dc.customer_id ORDER BY dd.date, fs.sales_id) AS 'order_number',
+      LEAD(dd.date) OVER(PARTITION BY fs.customer_key ORDER BY dd.date, fs.sales_id) AS 'second_order_date'
+FROM
+      dim_customer dc 
+LEFT JOIN
+      fact_sales fs 
+ON 
+      dc.customer_key = fs.customer_key
+LEFT JOIN 
+      dim_date dd 
+ON
+      fs.date_key = dd.date_key
+)
+SELECT 
+      customer_key,
+      customer_name,
+      order_date as 'first_order_date',
+      second_order_date,
+      DATEDIFF(second_order_date, order_date) AS 'days_between_orders'
+FROM 
+      customers_cte
+WHERE 
+      order_number = 1
+      AND second_order_date IS NOT NULL
+      AND DATEDIFF(second_order_date, order_date) BETWEEN 0 AND 7;
+
+
 
 
 
